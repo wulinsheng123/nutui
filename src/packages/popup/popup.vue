@@ -34,48 +34,48 @@ const overflowScrollReg = /scroll|auto/i;
 const popupProps = {
   position: {
     type: String,
-    default: 'center'
+    default: 'center',
   },
 
   transition: String,
 
   closeable: {
     type: Boolean,
-    default: false
+    default: false,
   },
   closeIconPosition: {
     type: String,
-    default: 'top-right'
+    default: 'top-right',
   },
   closeIcon: {
     type: String,
-    default: 'cross'
+    default: 'cross',
   },
 
   closeOnClickOverlay: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   destroyOnClose: {
     type: Boolean,
-    default: false
+    default: false,
   },
   getContainer: String,
   round: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 };
 export default {
   name: 'nut-popup',
   mixins: [touchMixins],
   components: {
-    icon: Icon
+    icon: Icon,
   },
   props: {
     ...overlayProps,
-    ...popupProps
+    ...popupProps,
   },
   created() {
     this.transition ? (this.transitionName = this.transition) : (this.transitionName = `popup-slide-${this.position}`);
@@ -95,7 +95,7 @@ export default {
       this.$emit('input', true);
       this.keepAlive = false;
     }
-  }, 
+  },
   deactivated() {
     if (this.value) {
       this.close();
@@ -111,19 +111,19 @@ export default {
       val === 'center' ? (this.transitionName = 'popup-fade') : (this.transitionName = `popup-slide-${this.position}`);
     },
     getContainer: 'portal',
-    overlay: 'renderOverlay'
+    overlay: 'renderOverlay',
   },
   data() {
     return {
       showSlot: true,
       transitionName: 'popup-fade-center',
-      overlayInstant: null
+      overlayInstant: null,
     };
   },
   computed: {
     transitionDuration() {
       return this.duration ? this.duration + 's' : 'initial';
-    }
+    },
   },
 
   methods: {
@@ -131,7 +131,9 @@ export default {
       if (this.opened) {
         return;
       }
-
+      if (this.destroyOnClose) {
+        this.showSlot = true;
+      }
       this.opened = true;
       this.$emit('open');
 
@@ -142,7 +144,7 @@ export default {
         overlayClass,
         overlayStyle,
         lockScroll,
-        closeOnClickOverlay
+        closeOnClickOverlay,
       };
 
       this.renderOverlay(config);
@@ -176,7 +178,7 @@ export default {
       const { scrollHeight, offsetHeight, scrollTop } = el ? el : this.$el;
 
       if ((this.deltaY > 0 && scrollTop === 0) || (this.deltaY < 0 && scrollTop + offsetHeight >= scrollHeight)) {
-        //event.preventDefault();
+        event.preventDefault();
       }
     },
     getScroller(el) {
@@ -205,6 +207,11 @@ export default {
           document.body.classList.remove('nut-overflow-hidden');
         }
       }
+      if (this.destroyOnClose) {
+        setTimeout(() => {
+          this.showSlot = false;
+        }, this.duration * 1000);
+      }
 
       overlayManager.closeOverlay(this);
       this.$emit('input', false);
@@ -227,8 +234,8 @@ export default {
       if (container && container !== el.parentNode) {
         container.appendChild(el);
       }
-    }
-  }
+    },
+  },
 };
 export { popupProps };
 </script>
