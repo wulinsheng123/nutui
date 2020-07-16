@@ -201,7 +201,7 @@ export default {
     };
   },
   mounted() {
-    this.defaultValueData = [this.listData[0][3]];
+    this.defaultValueData = [{label: 4,value: '北京市'}];
     this.defaultValueData1 = ['周四', '下午'];
   },
   methods: {
