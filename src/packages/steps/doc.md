@@ -90,11 +90,11 @@
 
 | 字段    | 说明                                  | 类型   | 默认值                                                   |
 |---------|---------------------------------------|--------|----------------------------------------------------------|
-| current | 当前所在的步骤                        | Number | 0                                                        |
+| current | 当前所在的步骤                        | Number | 1                                                       |
 | time-forward  | 时间前置选项                    | Boolean | false |
 | direction  | 垂直或水平方向 | String  | vertical                                                       |
 | type  | 步骤条类型 | String  | '' (可选 process, mini)                                                       |
-| source  | 数据依赖 | any  |                                                     |
+
 ### nut-step
   
 | 字段    | 说明              | 类型   | 默认值   |

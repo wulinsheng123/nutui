@@ -5,7 +5,7 @@
       <div class="nut-step-icon">
         <span v-if="type === 'mini'" class="default-icon"></span>
         <slot v-else name="status-icon">
-          <nut-icon v-if="currentStatus === 'nut-step-status-finish'" type="self" :url="require('../../assets/svg/finish.svg')"></nut-icon>
+          <nut-icon v-if="currentStatus.indexOf('nut-step-status-finish') > -1" type="self" :url="require('../../assets/svg/finish.svg')"></nut-icon>
           <span v-else class="default-icon"></span>
         </slot>
       </div>
@@ -23,6 +23,7 @@ import locale from '../../mixins/locale';
 export default {
   name: 'nut-step',
   mixins: [locale],
+  inject: ['timeForward', 'type', 'steps', 'getCurrentIndex', 'pushStep', 'delStep'],
   props: {
     title: {
       type: String,
@@ -37,11 +38,45 @@ export default {
   data() {
     return {
       currentStatus: '',
-      timeForward: false,
-      type: '',
+      index: -1,
     };
   },
-  methods: {},
-  mounted() {},
+  computed: {
+    current() {
+      return this.getCurrentIndex();
+    },
+  },
+  created() {
+    this.pushStep(this);
+  },
+  beforeDestroy() {
+    this.delStep(this);
+  },
+  methods: {
+    getCurrentStatus() {
+      let currentStatus = '';
+      if (this.current === this.index + 1) {
+        currentStatus += ' nut-step-status-process';
+      }
+      if (this.type === 'process') {
+        if (this.index < this.current) {
+          currentStatus += ' nut-step-status-finish';
+        }
+        if (this.index > this.current) {
+          currentStatus += ' nut-step-status-wait';
+        }
+      }
+      if (this.index + 1 === this.steps.length) {
+        currentStatus += ' nut-step-last';
+      }
+      this.currentStatus = currentStatus;
+    },
+  },
+  mounted() {
+    const unwatch = this.$watch('index', (val) => {
+      this.$watch('current', this.getCurrentStatus, { immediate: true });
+      unwatch();
+    });
+  },
 };
 </script>
