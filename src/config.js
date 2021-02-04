@@ -427,6 +427,15 @@ module.exports = {
           sort: 6,
           show: true,
           author: 'Drjingfubo'
+        },
+        {
+          name: 'CountDown',
+          sort: 7,
+          cName: '倒计时',
+          type: 'componment',
+          show: true,
+          desc: '倒计时',
+          author: 'liqiong43'
         }
       ]
     },
