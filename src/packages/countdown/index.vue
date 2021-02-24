@@ -4,27 +4,17 @@
       <span class="nut-cd-block">{{ plainText }}</span>
     </template>
 
-    <template v-else-if="ownStyle">
-      <slot name="default">
-        <!-- <view>123</view>
-        <span class="nut-cd-block">{{ resttime.h }}22</span>
-        <span class="nut-cd-dot">:</span>
-        <span class="nut-cd-block">{{ resttime.m }}</span>
-        <span class="nut-cd-dot">:</span>
-        <span class="nut-cd-block">{{ resttime.s }}</span> -->
-      </slot>
-    </template>
-
     <template v-else>
-      <template v-if="resttime.d >= 0 && showDays">
+      <slot name="default" v-if="ownStyle"></slot>
+      <template v-if="resttime.d >= 0 && showDays && !ownStyle">
         <span class="nut-cd-block">{{ resttime.d }}</span>
         <span class="nut-cd-dot">天</span>
       </template>
-      <span class="nut-cd-block">{{ resttime.h }}</span>
-      <span class="nut-cd-dot">:</span>
-      <span class="nut-cd-block">{{ resttime.m }}</span>
-      <span class="nut-cd-dot">:</span>
-      <span class="nut-cd-block">{{ resttime.s }}</span>
+      <span v-if="!ownStyle" class="nut-cd-block">{{ resttime.h }}</span>
+      <span v-if="!ownStyle" class="nut-cd-dot">:</span>
+      <span v-if="!ownStyle" class="nut-cd-block">{{ resttime.m }}</span>
+      <span v-if="!ownStyle" class="nut-cd-dot">:</span>
+      <span v-if="!ownStyle" class="nut-cd-block">{{ resttime.s }}</span>
       <template v-if="millisecond">
         <span class="nut-cd-dot">:</span>
         <span class="nut-cd-block">{{ resttime.mms }}</span>
@@ -88,7 +78,7 @@ export default create({
   emits: ['on-paused', 'on-end', 'on-restart', 'on-reset', 'on-restTime'],
 
   setup(props, { emit }) {
-    console.log('props', props);
+    // console.log('props', props);
 
     const restTime = ref(0);
     const p = ref(0);
@@ -155,10 +145,8 @@ export default create({
         rest.h = fill2(Number(rest.h) + d * 24);
         rest.d = 0;
       }
-      console.log('222');
-      emit('on-restTime', 1);
-
-      console.log('11111');
+      // emit('on-restTime', rest);
+      emit('on-end', rest);
       return rest;
     });
 
@@ -176,12 +164,15 @@ export default create({
 
     //初始化时间值
     function initTimer() {
+      console.log('执行initTimer');
       const delay = 1000;
       const curr = Date.now();
-      // const serverTime = Date.now() - 1 * 1000;
-      // const endTime = Date.now() + 50 * 1000;
-      const start = getTimeStamp(props.startTime || curr);
-      const end = getTimeStamp(props.endTime || curr);
+      const serverTime = Date.now() - 1 * 1000;
+      const endTime = Date.now() + 50 * 1000;
+      const start = getTimeStamp(serverTime || curr);
+      const end = getTimeStamp(endTime || curr);
+      // const start = getTimeStamp(props.startTime || curr);
+      // const end = getTimeStamp(props.endTime || curr);
       const diffTime = curr - start;
       restTime.value = end - (start + diffTime);
       const timer = setInterval(() => {
@@ -200,16 +191,25 @@ export default create({
     }
 
     function initTimers() {
+      console.log('执行initTimers');
+      console.log('props.paused', props.paused);
+      console.log('props.reset', props.reset);
+
       const delay = 1000;
       const serverTime = Date.now() - 1 * 1000;
       const endTime = Date.now() + 50 * 1000;
       const curr = Date.now();
       const start = getTimeStamp(serverTime || curr);
       const end = getTimeStamp(endTime || curr);
+
+      //   const start = getTimeStamp(props.startTime || curr);
+      // const end = getTimeStamp(props.endTime || curr);
+
       const diffTime = curr - start;
       restTime.value = end - (start + diffTime);
       const timer = setInterval(() => {
         if (!props.paused && props.reset) {
+          console.log('执行initTimers 倒计时');
           let restTimee = end - (Date.now() - p.value + diffTime);
           restTime.value = restTimee;
           if (restTime.value < delay) {
@@ -239,17 +239,20 @@ export default create({
 
     watch(
       ov => props.paused,
+      //  o => props.reset,
       ov => {
         if (ov) {
           //暂停
           curr.value = getTimeStamp();
           props.reset == false;
           emit('on-paused', restTime.value);
+          console.log('暂停');
         } else if (!ov) {
           //重启
           p.value += getTimeStamp() - curr.value;
           props.reset == false;
           emit('on-restart', restTime.value);
+          console.log('继续');
         }
       }
     );
@@ -258,10 +261,19 @@ export default create({
       ov => props.reset,
       ov => {
         console.log('监听到reset值', props.reset);
-        if (ov == true) {
-          props.reset == true;
-
+        // initTimers();
+        // console.log('reset 重新计时',)
+        if (ov) {
+          //暂停
+          // curr.value = getTimeStamp();
+          // props.paused == false;
+          emit('on-reset', restTime.value);
+          console.log('重新');
           initTimers();
+          //重启
+          // p.value += getTimeStamp();
+          // // props.reset == false;
+          // emit('on-reset', restTime.value);
         }
       }
     );

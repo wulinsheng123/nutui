@@ -15,22 +15,22 @@
     </view>
 
     <h2>毫秒级渲染</h2>
-    <!-- <view>
+    <view>
       <nut-cell>
         <nut-countdown :endTime="end" @on-end="onend" millisecond />
       </nut-cell>
-    </view> -->
+    </view>
 
     <h2>自定义样式</h2>
     <view>
       <nut-cell>
-        <nut-countdown @on-restTime="onrestTime">
+        <nut-countdown :endTime="end" @on-end="onend" ownStyle>
           <template #default>
-            <span class="block">{{ restTime.h }}33</span>
+            <span class="block">{{ restTimes.h }}</span>
             <span class="colon">:</span>
-            <span class="block">{{ restTime.m }}</span>
+            <span class="block">{{ restTimes.m }}</span>
             <span class="colon">:</span>
-            <span class="block">{{ restTime.s }}</span>
+            <span class="block">{{ restTimes.s }}</span>
           </template>
         </nut-countdown>
       </nut-cell>
@@ -63,7 +63,7 @@
         ></nut-icon>
       </view>
 
-      <view @click="onreset" class="operate">
+      <view @click="resets" class="operate">
         <nut-icon size="24px" class="icon" name="retweet"></nut-icon>
       </view>
     </view>
@@ -79,16 +79,17 @@ export default createDemo({
     const serverTime = (Date.now() - 30 * 1000) as number;
     const end = (Date.now() + 50 * 1000) as number;
     const asyncEnd = 0 as number;
-    const restTime = reactive({});
+    const restTimes = reactive({ d: '', h: '', m: '', s: '', mms: '' });
     const paused = ref(false);
     const reset = ref(false);
 
-    watch(
-      ov => restTime,
-      ov => {
-        console.log('22restTime', ov);
-      }
-    );
+    const onend = restTime => {
+      // console.log('countdown: ended.', end);
+      restTimes.h = restTime.h;
+      restTimes.m = restTime.m;
+      restTimes.s = restTime.s;
+    };
+
     const start = () => {
       console.log('paused.value', paused.value);
       paused.value = false;
@@ -99,22 +100,23 @@ export default createDemo({
       paused.value = true;
     };
 
-    const onend = () => {
-      console.log('countdown: ended.', end);
+    const resets = () => {
+      console.log('reset.value: ', reset.value);
+      reset.value = true;
+      paused.value = false;
     };
+
     const onpaused = v => {
+      //暂停
       console.log('paused: ', v);
     };
     const onrestart = v => {
+      //继续
       console.log('restart: ', v);
     };
-    const onreset = () => {
-      reset.value = !reset.value;
-      console.log('reset.value: ', reset.value);
-    };
-
-    const onrestTime = restTime => {
-      console.log('&&&&&', restTime);
+    const onreset = v => {
+      //重启
+      console.log('onreset: ', v);
     };
 
     onMounted(() => {
@@ -129,13 +131,13 @@ export default createDemo({
       onpaused,
       onrestart,
       onreset,
-      onrestTime,
-      restTime,
+      restTimes,
       reset,
       asyncEnd,
       paused,
       start,
-      stop
+      stop,
+      resets
     };
   }
 });
@@ -143,9 +145,12 @@ export default createDemo({
 
 <style lang="scss" scoped>
 .colon {
-  display: inline-block;
-  margin: 0 4px;
-  color: #ee0a24;
+  width: 4px;
+  height: 20px;
+  line-height: 20px;
+  font-family: PingFangSC-Regular;
+  font-size: 14px;
+  color: rgba(73, 130, 242, 1);
 }
 .block {
   display: inline-block;
@@ -153,6 +158,10 @@ export default createDemo({
   color: #fff;
   font-size: 12px;
   text-align: center;
-  background-color: #ee0a24;
+  background: linear-gradient(
+    315deg,
+    rgba(73, 143, 242, 1) 0%,
+    rgba(73, 101, 242, 1) 100%
+  );
 }
 </style>
