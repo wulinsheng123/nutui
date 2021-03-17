@@ -3,7 +3,7 @@
   <div class="doc-content" :class="themeName()">
     <div class="doc-content-index">
       <div class="content-left">
-        <div class="content-title"> Nut UI 3.0 </div>
+        <div class="content-title"> NutUI 3.0 </div>
         <div class="content-smile"> </div>
         <div class="content-subTitle">一款具有京东风格的VUE组件</div>
         <div class="content-button">
@@ -87,8 +87,11 @@
     <div class="doc-content-more" v-if="articleList.length > 0">
       <div class="doc-content-hd">
         <h4 class="doc-content-title">更多内容</h4>
-        <a class="sub-more" href="https://jelly.jd.com" target="_blank"
-          >更多内容</a
+        <a
+          class="sub-more"
+          href="https://jelly.jd.com/search/all?keyword=nutui"
+          target="_blank"
+          >More</a
         >
       </div>
       <ul class="more-list">
@@ -129,10 +132,14 @@ export default defineComponent({
       // 文章列表接口
       const articleApiService = new ArticleApiService();
       articleApiService.getArticle().then(res => {
-        console.log('res', res);
         if (res?.state == 0) {
-          data.articleList = res.value.data.arrays as any[];
-          console.log('data.articleList', data.articleList);
+          data.articleList = (res.value.data.arrays as any[])
+            .map(item => {
+              if (item.type == 1) {
+                return item;
+              }
+            })
+            .filter(i => i);
         }
       });
     });
@@ -174,18 +181,21 @@ export default defineComponent({
     line-height: 52px;
     margin-bottom: 50px;
     text-align: center;
+    position: relative;
     .sub-more {
-      float: right;
+      position: absolute;
+      right: 0;
+      font-size: 14px;
       color: $theme-red;
     }
   }
   &-title {
     display: inline-block;
-    font-size: 36px;
+    font-size: 26px;
     font-family: PingFangSC-Medium;
   }
   &-features {
-    width: 1230px;
+    width: 1200px;
     margin: 0 auto 90px;
     .features-list {
       display: flex;
@@ -196,20 +206,19 @@ export default defineComponent({
       width: 296px;
       text-align: center;
       img {
-        width: 160px;
-        height: 160px;
+        width: 100px;
+        height: 100px;
         margin-bottom: 20px;
       }
     }
     .features-title {
-      margin-bottom: 18px;
-      line-height: 50px;
+      margin-bottom: 20px;
       font-family: PingFangSC-Medium;
-      font-size: 36px;
+      font-size: 24px;
     }
     .features-desc {
-      font-size: 18px;
-      line-height: 24px;
+      font-size: 14px;
+      line-height: 18px;
     }
   }
   &-more {
@@ -231,13 +240,14 @@ export default defineComponent({
         height: 170px;
         margin-bottom: 20px;
         border-radius: 6px;
+        box-shadow: 0px 1px 7px 0px rgba(237, 238, 241, 1);
       }
     }
     .more-title {
       width: 280px;
       height: 44px;
       line-height: 22px;
-      font-size: 16px;
+      font-size: 14px;
       text-overflow: -o-ellipsis-lastline;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -250,7 +260,7 @@ export default defineComponent({
 }
 .doc-content-index {
   display: flex;
-  flex: 1;
+  height: 926px;
   margin-bottom: 70px;
   background-color: #070505;
   .content-left {
@@ -313,6 +323,7 @@ export default defineComponent({
       }
       .rightButton {
         display: flex;
+        position: relative;
         .rightButtonText {
           align-self: center;
           margin: auto;
@@ -336,7 +347,7 @@ export default defineComponent({
       .qrcodepart {
         display: none;
         position: absolute;
-        left: 0;
+        right: -10px;
         top: 50px;
         padding: 4px;
         width: 166px;
@@ -346,8 +357,7 @@ export default defineComponent({
         .qrcode-text {
           font-size: 14px;
           color: rgba(51, 51, 51, 1);
-          margin-top: 10px;
-          margin-left: 6px;
+          text-align: center;
         }
         .qrcode {
           width: 160px;

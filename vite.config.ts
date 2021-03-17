@@ -5,6 +5,7 @@ import path from 'path';
 const resolve = path.resolve;
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/3x/',
   server: {
     proxy: {
       '/devServer': {
@@ -33,6 +34,7 @@ export default defineConfig({
     Markdown()
   ],
   build: {
+    outDir: './dist/3x/',
     cssCodeSplit: false,
     rollupOptions: {
       input: {
